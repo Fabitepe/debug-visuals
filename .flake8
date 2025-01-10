@@ -1,0 +1,12 @@
+[flake8]
+extend-ignore = 
+    E203
+    E251
+
+exclude =
+    .git,
+    __pycache__,
+    dist,
+    deb_dist,
+
+max-line-length = 120

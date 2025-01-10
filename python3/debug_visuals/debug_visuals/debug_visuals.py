@@ -1,11 +1,28 @@
+# Needed to function imports
 from typing import List, Any
-from shapely.geometry.base import BaseGeometry
 import random
-
 import json
+
+# additional imports
+try:
+    from shapely.geometry.base import BaseGeometry
+except ModuleNotFoundError:
+    pass
+
+try:
+    from geopandas import GeoSeries, GeoDataFrame
+except ModuleNotFoundError:
+    pass
 
 
 class Visualizer:
+    """
+    This is an abstract class that collects all visualization functions with a single import
+    Use it in the file that you want to debug by importing it:
+        `from debug_visuals import Visualizer`
+    And use it inside the debug visualizer view:
+        `Visualizer.vis(your_variable)`
+    """
 
     @staticmethod
     def vis(var: Any) -> str:
@@ -22,6 +39,11 @@ class Visualizer:
 
         if isinstance(var, BaseGeometry):
             return Visualizer.shape(var)
+
+        if isinstance(var, GeoDataFrame):
+            return Visualizer.shape([geom for geom in var.geometry])
+        if isinstance(var, GeoSeries):
+            return Visualizer.shape([geom for geom in var])
 
         if isinstance(var, dict):
             return Visualizer.vis_dict(var)
@@ -49,7 +71,7 @@ class Visualizer:
         return list(xs), list(ys)
 
     @staticmethod
-    def geometry_to_plotly_traces(geom: BaseGeometry):
+    def geometry_to_plotly_traces(geom: BaseGeometry, cnt = None):
         """
         Convert a Shapely geometry into a list of Plotly trace dictionaries.
         Each trace is an item in the 'data' array of a Plotly figure.
@@ -57,7 +79,9 @@ class Visualizer:
         h = random.randrange(0, 256, 1)
         color = f"hsla({h}, 100%, 50%, 0.5)"
         fill_color = f"hsla({h}, 100%, 50%, 0.1)"
-
+        name_prefix = None
+        if cnt is not None:
+            name_prefix = f"{cnt}: "
         traces = []
         geom_type = geom.geom_type.lower()
 
@@ -73,7 +97,7 @@ class Visualizer:
                 "y": [y],
                 "mode": "markers",
                 "marker": {"color": color},
-                "name": "Point"
+                "name": name_prefix + "Point"
             })
 
         elif geom_type == "linestring" or geom_type == "linearring":
@@ -84,7 +108,7 @@ class Visualizer:
                 "y": y,
                 "mode": "lines",
                 "line": {"color": color},
-                "name": geom.__class__.__name__
+                "name": name_prefix + geom.__class__.__name__
             })
 
         elif geom_type == "polygon":
@@ -98,7 +122,7 @@ class Visualizer:
                 "fill": "toself",    # fill the polygon
                 "fillcolor": fill_color,
                 "line": {"color": color},
-                "name": "Polygon Exterior"
+                "name": name_prefix + "Polygon Exterior"
             })
 
             # Interior rings (holes)
@@ -112,13 +136,13 @@ class Visualizer:
                     "fill": "tonext",  # subtract from previous fill
                     "fillcolor": fill_color,
                     "line": {"color": color, "dash": "dot"},
-                    "name": f"Hole {i}"
+                    "name": f"    |-  Hole {i}"
                 })
 
         elif geom_type.startswith("multi") or geom_type == "geometrycollection":
             # MultiPoint, MultiLineString, MultiPolygon, or GeometryCollection
-            for part in geom.geoms:
-                traces.extend(Visualizer.geometry_to_plotly_traces(part, color=color))
+            for i, part in enumerate(geom.geoms):
+                traces.extend(Visualizer.geometry_to_plotly_traces(part, cnt = f"{cnt}.{i}"))
 
         return traces
 
@@ -134,8 +158,8 @@ class Visualizer:
             geoms = [geom]
 
         traces = []
-        for g in geoms:
-            traces.extend(Visualizer.geometry_to_plotly_traces(g))
+        for i, g in enumerate(geoms):
+            traces.extend(Visualizer.geometry_to_plotly_traces(g, i))
 
         # Basic 2D layout
         layout = {

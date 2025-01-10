@@ -1,9 +1,8 @@
-from shapely import Polygon, LineString, LinearRing
+from shapely import Polygon, LineString, LinearRing, MultiLineString
 import random
 
 # import the visualizer to get access to all functions
 from debug_visuals import Visualizer
-
 
 geoms = []
 coord_values = []
@@ -23,6 +22,13 @@ geoms.append(
                 (1.5, 1.5),
                 (0.5, 1.5),
                 (0.5, 0.5)
+            ],
+            [
+                (0.5 * 0.01, 0.5),
+                (1.5 * 0.01, 0.5),
+                (1.5 * 0.01, 1.5),
+                (0.5 * 0.01, 1.5),
+                (0.5 * 0.01, 0.5)
             ]
         ]
     )
@@ -58,5 +64,7 @@ for i in range(10):
         )
         coord_values.extend([coords[ii][0], coords[ii][1]])
     geoms.append(LinearRing(coords))
+
+geoms.append(MultiLineString([geoms[-1], geoms[-2]]))
 
 print("test")

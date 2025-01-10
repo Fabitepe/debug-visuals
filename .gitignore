@@ -1,1 +1,4 @@
-__pycache__
+*/__pycache__
+build
+debug_visuals.egg-info
+dist
