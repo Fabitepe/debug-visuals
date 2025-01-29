@@ -56,7 +56,7 @@ class Visualizer:
         )
 
     @staticmethod
-    def _coords_to_xy(coords):
+    def _coords_to_xy(coords, close = True):
         """
         Given a sequence of Shapely coordinates, return separate lists of x and y.
         Ensures the ring is closed if it's a polygon boundary.
@@ -65,7 +65,8 @@ class Visualizer:
             # For polygon boundaries, Shapely often includes the closing
             # coordinate anyway, but just in case, we can ensure the
             # ring is closed:
-            coords = list(coords) + [coords[0]]
+            if close:
+                coords = list(coords) + [coords[0]]
 
         xs, ys = zip(*coords)
         return list(xs), list(ys)
@@ -101,7 +102,10 @@ class Visualizer:
             })
 
         elif geom_type == "linestring" or geom_type == "linearring":
-            x, y = Visualizer._coords_to_xy(geom.coords)
+            if geom_type == "linestring":
+                x, y = Visualizer._coords_to_xy(geom.coords, False)
+            else:
+                x, y = Visualizer._coords_to_xy(geom.coords)
             traces.append({
                 "type": "scatter",
                 "x": x,

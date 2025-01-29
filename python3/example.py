@@ -55,6 +55,13 @@ test = {
     ],
     "geoms:": geoms
 }
+linestring = LineString(
+    [
+        (0, 0),
+        (1, 0),
+        (1, 1),
+    ]
+)
 geoms.append(LineString([(0, 0), (1, 1)]))
 for i in range(10):
     coords = []
