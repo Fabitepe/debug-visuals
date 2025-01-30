@@ -6,7 +6,7 @@ with open("../../README.md") as file:
 
 setup(
     name="debug_visuals",
-    version="0.0.2",
+    version="0.0.3",
     description="Visualization functions ready-to-use with VS Code Debug Visualizer",
     author="Fabian Tepe",
     author_email="fabiantepe1.2@gmail.com",

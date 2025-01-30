@@ -41,9 +41,9 @@ class Visualizer:
             return Visualizer.shape(var)
 
         if isinstance(var, GeoDataFrame):
-            return Visualizer.shape([geom for geom in var.geometry])
+            return Visualizer.shape([geom for geom in var.geometry if geom is not None])
         if isinstance(var, GeoSeries):
-            return Visualizer.shape([geom for geom in var])
+            return Visualizer.shape([geom for geom in var if geom is not None])
 
         if isinstance(var, dict):
             return Visualizer.vis_dict(var)
@@ -72,11 +72,13 @@ class Visualizer:
         return list(xs), list(ys)
 
     @staticmethod
-    def geometry_to_plotly_traces(geom: BaseGeometry, cnt = None):
+    def geometry_to_plotly_traces(geom: BaseGeometry, cnt = None) -> List[dict]:
         """
         Convert a Shapely geometry into a list of Plotly trace dictionaries.
         Each trace is an item in the 'data' array of a Plotly figure.
         """
+        if geom is None:
+            return []
         h = random.randrange(0, 256, 1)
         color = f"hsla({h}, 100%, 50%, 0.5)"
         fill_color = f"hsla({h}, 100%, 50%, 0.1)"

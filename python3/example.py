@@ -1,4 +1,5 @@
-from shapely import Polygon, LineString, LinearRing, MultiLineString
+from shapely import Polygon, LineString, LinearRing, MultiLineString, GeometryCollection
+from geopandas import GeoDataFrame
 import random
 
 # import the visualizer to get access to all functions
@@ -73,5 +74,7 @@ for i in range(10):
     geoms.append(LinearRing(coords))
 
 geoms.append(MultiLineString([geoms[-1], geoms[-2]]))
+
+gdf = GeoDataFrame(geometry=[geoms[0], None, linestring])
 
 print("test")
