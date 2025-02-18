@@ -1,4 +1,4 @@
-from shapely import Polygon, LineString, LinearRing, MultiLineString, GeometryCollection
+from shapely import Polygon, LineString, LinearRing, MultiLineString
 from geopandas import GeoDataFrame
 import random
 

@@ -72,16 +72,16 @@ class Visualizer:
         return list(xs), list(ys)
 
     @staticmethod
-    def geometry_to_plotly_traces(geom: BaseGeometry, cnt = None) -> List[dict]:
+    def geometry_to_plotly_traces(geom: BaseGeometry, cnt = None, hue: int | None = None):
         """
         Convert a Shapely geometry into a list of Plotly trace dictionaries.
         Each trace is an item in the 'data' array of a Plotly figure.
         """
-        if geom is None:
-            return []
-        h = random.randrange(0, 256, 1)
-        color = f"hsla({h}, 100%, 50%, 0.5)"
-        fill_color = f"hsla({h}, 100%, 50%, 0.1)"
+        if hue is None:
+            hue = random.randrange(0, 256, 1)
+
+        color = f"hsla({hue}, 100%, 50%, 0.5)"
+        fill_color = f"hsla({hue}, 100%, 50%, 0.1)"
         name_prefix = None
         if cnt is not None:
             name_prefix = f"{cnt}: "
@@ -164,8 +164,11 @@ class Visualizer:
             geoms = [geom]
 
         traces = []
+        hue_start = random.randrange(0, 256, 1)
+        hue_step = 255 / len(geoms)
         for i, g in enumerate(geoms):
-            traces.extend(Visualizer.geometry_to_plotly_traces(g, i))
+            hue = (hue_start + i * hue_step) % 255
+            traces.extend(Visualizer.geometry_to_plotly_traces(g, i, hue))
 
         # Basic 2D layout
         layout = {
